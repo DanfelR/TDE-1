@@ -1,0 +1,93 @@
+def read_file(file_path):
+    """Read the entire file and return a list of stripped lines."""
+    try:
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        return [line.strip() for line in lines]
+    except FileNotFoundError:
+        print(f"Error: The file '{file_path}' was not found.")
+        raise
+    except IOError as e:
+        print(f"Error: An IOError occurred. Details: {e}")
+        raise
+
+def parse_set(set_string):
+    """Convert a comma-separated string into a set of integers."""
+    if not set_string:
+        return set()
+    return set(map(int, set_string.split(', ')))
+
+def union(set1, set2):
+    """Return the union of two sets."""
+    return set1 | set2
+
+def intersection(set1, set2):
+    """Return the intersection of two sets."""
+    return set1 & set2
+
+def difference(set1, set2):
+    """Return the difference of two sets."""
+    return set1 - set2
+
+def cartesian_product(set1, set2):
+    """Return the Cartesian product of two sets."""
+    return {(a, b) for a in set1 for b in set2}
+
+def format_set(s):
+    """Format a set into a string with elements sorted and enclosed in curly braces."""
+    return '{' + ', '.join(map(str, sorted(s))) + '}'
+
+def format_cartesian_product(cp):
+    """Format the Cartesian product into a string with tuples sorted and enclosed in curly braces."""
+    return '{' + ', '.join(f'({x}, {y})' for x, y in sorted(cp)) + '}'
+
+def main(file_path):
+    """Process the file and perform operations on sets according to the commands."""
+    lines = read_file(file_path)
+    try:
+        num_operations = int(lines[0])
+    except ValueError:
+        print("Error: The first line of the file must be an integer representing the number of operations.")
+        return
+
+    index = 1  # Start reading operations after the first line
+    results = []
+
+    for _ in range(num_operations):
+        if index + 2 >= len(lines):
+            print("Error: Insufficient lines for the number of operations specified.")
+            break
+        
+        operation = lines[index]
+        set1 = parse_set(lines[index + 1])
+        set2 = parse_set(lines[index + 2])
+        
+        if operation == 'U':
+            result = union(set1, set2)
+            operation_name = "Union"
+        elif operation == 'I':
+            result = intersection(set1, set2)
+            operation_name = "Intersection"
+        elif operation == 'D':
+            result = difference(set1, set2)
+            operation_name = "Difference"
+        elif operation == 'C':
+            result = cartesian_product(set1, set2)
+            operation_name = "Cartesian Product"
+        else:
+            print(f"Error: Unknown operation code '{operation}'.")
+            continue
+
+        result_str = format_cartesian_product(result) if operation == 'C' else format_set(result)
+        set1_str = format_set(set1)
+        set2_str = format_set(set2)
+        results.append(f"{operation_name}: set 1 {set1_str}, set 2 {set2_str}. Result: {result_str}")
+        
+        index += 3  # Move to the next operation set
+
+    for result in results:
+        print(result)
+
+if __name__ == "__main__":
+    file_path = "input.txt"  # Replace with the path to your input file
+    main(file_path)
